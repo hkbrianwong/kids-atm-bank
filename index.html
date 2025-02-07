@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kid’s ATM Bank</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #ffe4b5;
+            padding: 20px;
+        }
+
+        .container {
+            width: 320px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2, h3 {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            background-color: #fffacd;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            padding: 10px 15px;
+            font-size: 18px;
+            background-color: #87ceeb;
+            color: white;
+            margin: 5px 0;
+        }
+
+        button:hover {
+            background-color: #00bfff;
+        }
+
+        .primary-action {
+            font-size: 22px;
+            padding: 15px;
+            width: 100%;
+            margin: 10px 0;
+            background-color: #00c853;
+            color: white;
+        }
+
+        .primary-action.take-out {
+            background-color: #d50000;
+        }
+
+        .primary-action:hover {
+            opacity: 0.9;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pin-button {
+            font-size: 24px;
+            height: 70px;
+            font-family: Arial, sans-serif;
+            background-color: #ff8a65;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .pin-button:hover {
+            background-color: #ff7043;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PIN Entry Screen -->
+    <div id="pin-screen" class="container">
+        <h2>Enter Your Secret Code</h2>
+        <input type="password" id="pin-input" maxlength="4" readonly>
+
+        <div class="button-grid">
+            <button class="pin-button" onclick="enterPin(1)">1</button>
+            <button class="pin-button" onclick="enterPin(2)">2</button>
+            <button class="pin-button" onclick="enterPin(3)">3</button>
+            <button class="pin-button" onclick="enterPin(4)">4</button>
+            <button class="pin-button" onclick="enterPin(5)">5</button>
+            <button class="pin-button" onclick="enterPin(6)">6</button>
+            <button class="pin-button" onclick="enterPin(7)">7</button>
+            <button class="pin-button" onclick="enterPin(8)">8</button>
+            <button class="pin-button" onclick="enterPin(9)">9</button>
+            <button class="pin-button" onclick="clearPin()">Clear</button>
+            <button class="pin-button" onclick="enterPin(0)">0</button>
+            <button class="pin-button" onclick="submitPin()">Enter</button>
+        </div>
+    </div>
+
+    <!-- ATM Screen -->
+    <div id="atm-screen" class="container hidden">
+        <h2>Welcome to Your Bank!</h2>
+        <h3>Your Balance: $<span id="balance">0.00</span></h3>
+
+        <input type="number" id="amount" placeholder="How much money?">
+        <input type="text" id="description" placeholder="What is it for? (optional)">
+        <input type="date" id="date">
+
+        <button class="primary-action" onclick="addMoney()">💰 Add Money</button>
+        <button class="primary-action take-out" onclick="subtractMoney()">🛍️ Take Out Money</button>
+
+        <button onclick="undoLastTransaction()">🔄 Undo Last</button>
+
+        <h3>What Happened?</h3>
+        <div id="history"></div>
+
+        <div class="nav-buttons">
+            <button onclick="prevPage()">⬅️ Previous</button>
+            <button onclick="nextPage()">➡️ Next</button>
+        </div>
+
+        <p id="page-info"></p>
+
+        <button class="hidden" id="recalculate-btn" onclick="cleanupBalance()">🔧 Fix Balance</button>
+        <button onclick="endSession()">🏁 End Session</button>
+    </div>
+
+    <!-- Admin Screen -->
+    <div id="admin-screen" class="container hidden">
+        <h2>👩‍💻 Admin Mode</h2>
+        <button onclick="resetAllData()">🧹 Reset All Data</button>
+        <button onclick="endSession()">🚪 Exit</button>
+    </div>
+
+    <script>
+        let balance = parseFloat(localStorage.getItem("balance")) || 0;
+        let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        let savedPin = localStorage.getItem("pin") || null;
+        let enteredPin = "";
+        let currentPage = 0;
+        const recordsPerPage = 10;
+
+        document.getElementById("date").value = new Date().toISOString().split("T")[0];
+
+        function enterPin(num) {
+            if (enteredPin.length < 4) {
+                enteredPin += num;
+                document.getElementById("pin-input").value = enteredPin.replace(/./g, "*");
+            }
+        }
+
+        function clearPin() {
+            enteredPin = "";
+            document.getElementById("pin-input").value = "";
+        }
+
+        function submitPin() {
+            if (!savedPin) {
+                savedPin = enteredPin;
+                localStorage.setItem("pin", savedPin);
+                alert("PIN set successfully!");
+            }
+
+            if (enteredPin === savedPin) {
+                openAtmScreen();
+            } else if (enteredPin === "0000") {
+                openAdminScreen();
+            } else {
+                alert("Wrong code! Try again!");
+                clearPin();
+            }
+        }
+
+        function openAtmScreen() {
+            hideAllScreens();
+            document.getElementById("atm-screen").classList.remove("hidden");
+            document.getElementById("balance").innerText = balance.toFixed(2);
+            updateHistory();
+        }
+
+        function openAdminScreen() {
+            hideAllScreens();
+            document.getElementById("admin-screen").classList.remove("hidden");
+        }
+
+        function endSession() {
+            hideAllScreens();
+            document.getElementById("pin-screen").classList.remove("hidden");
+            clearPin();
+        }
+
+        function hideAllScreens() {
+            document.getElementById("pin-screen").classList.add("hidden");
+            document.getElementById("atm-screen").classList.add("hidden");
+            document.getElementById("admin-screen").classList.add("hidden");
+        }
+
+        function addMoney() {
+            let amount = parseFloat(document.getElementById("amount").value);
+            let description = document.getElementById("description").value.trim();
+            let date = document.getElementById("date").value;
+            let actualTimestamp = new Date().toISOString();
+
+            if (amount > 0) {
+                updateBalance(amount, "Deposit", description, date, actualTimestamp);
+            }
+        }
+
+        function subtractMoney() {
+            let amount = parseFloat(document.getElementById("amount").value);
+            let description = document.getElementById("description").value.trim();
+            let date = document.getElementById("date").value;
+            let actualTimestamp = new Date().toISOString();
+
+            if (amount > 0 && amount <= balance) {
+                updateBalance(-amount, "Withdraw", description, date, actualTimestamp);
+            } else {
+                alert("Not enough balance!");
+            }
+        }
+
+        function updateBalance(amount, type, description, date, actualTimestamp) {
+            balance += amount;
+            transactions.push({ type, amount, description, date, actualTimestamp });
+            saveData();
+        }
+
+        function updateHistory() {
+            let historyContainer = document.getElementById("history");
+            historyContainer.innerHTML = "";
+
+            transactions.sort((a, b) => {
+                let dateComparison = new Date(b.date) - new Date(a.date);
+                if (dateComparison === 0) {
+                    return new Date(b.actualTimestamp) - new Date(a.actualTimestamp);
+                }
+                return dateComparison;
+            });
+
+            let start = currentPage * recordsPerPage;
+            let paginatedTransactions = transactions.slice(start, start + recordsPerPage);
+
+            paginatedTransactions.forEach(trx => {
+                let p = document.createElement("p");
+                p.innerText = `${trx.date} - ${trx.type}: $${trx.amount.toFixed(2)}${trx.description ? ` (${trx.description})` : ""}`;
+                historyContainer.appendChild(p);
+            });
+
+            document.getElementById("page-info").innerText = `Page ${currentPage + 1}`;
+        }
+
+        function prevPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                updateHistory();
+            }
+        }
+
+        function nextPage() {
+            if ((currentPage + 1) * recordsPerPage < transactions.length) {
+                currentPage++;
+                updateHistory();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem("balance", balance);
+            localStorage.setItem("transactions", JSON.stringify(transactions));
+            document.getElementById("balance").innerText = balance.toFixed(2);
+            updateHistory();
+        }
+
+        function resetAllData() {
+            if (confirm("Are you sure you want to reset all data?")) {
+                localStorage.clear();
+                balance = 0;
+                transactions = [];
+                savedPin = null;
+                alert("All data has been reset!");
+                location.reload();
+            }
+        }
+
+        function undoLastTransaction() {
+            if (transactions.length > 0) {
+                let lastTransaction = transactions.pop();
+                balance -= lastTransaction.type === "Deposit" ? lastTransaction.amount : -lastTransaction.amount;
+                saveData();
+                alert("Last transaction has been undone!");
+            } else {
+                alert("No transactions to undo!");
+            }
+        }
+    </script>
+</body>
+</html>
