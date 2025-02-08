@@ -44,6 +44,13 @@ input {
     margin-top: 20px;
 }
 
+.primary-action {
+    font-size: 26px;  /* Increase font size */
+    padding: 20px;    /* Increase padding */
+    width: 100%;      /* Ensure it stretches across the width */
+    margin: 15px 0;   /* Add more margin for spacing */
+}
+
 .pin-button {
     font-size: 22px;
     height: 60px;
