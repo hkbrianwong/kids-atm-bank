@@ -1,0 +1,91 @@
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #ffe4b5;
+    padding: 20px;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2, h3 {
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    font-size: 18px;
+    text-align: center;
+    border: 2px solid #ffd700;
+    border-radius: 10px;
+    background-color: #fffacd;
+    box-sizing: border-box;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.pin-button {
+    font-size: 22px;
+    height: 60px;
+    background-color: #ff8a65;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.pin-button:hover {
+    background-color: #ff7043;
+}
+
+.balance-display {
+    font-size: 24px;
+    color: #2e8b57;
+    font-weight: bold;
+    word-wrap: break-word;
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    input {
+        font-size: 16px;
+    }
+
+    .pin-button {
+        font-size: 20px;
+        height: 55px;
+    }
+
+    .balance-display {
+        font-size: 20px;
+    }
+
+    h2, h3 {
+        font-size: 20px;
+    }
+}

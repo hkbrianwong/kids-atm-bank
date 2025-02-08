@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kid’s ATM Bank</title>
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- PIN Entry Screen -->
+    <div id="pin-screen" class="container">
+        <h2>Enter Your Secret Code</h2>
+        <input type="password" id="pin-input" maxlength="4" readonly>
+
+        <div class="button-grid">
+            <button class="pin-button" onclick="enterPin(1)">1</button>
+            <button class="pin-button" onclick="enterPin(2)">2</button>
+            <button class="pin-button" onclick="enterPin(3)">3</button>
+            <button class="pin-button" onclick="enterPin(4)">4</button>
+            <button class="pin-button" onclick="enterPin(5)">5</button>
+            <button class="pin-button" onclick="enterPin(6)">6</button>
+            <button class="pin-button" onclick="enterPin(7)">7</button>
+            <button class="pin-button" onclick="enterPin(8)">8</button>
+            <button class="pin-button" onclick="enterPin(9)">9</button>
+            <button class="pin-button" onclick="clearPin()">Clear</button>
+            <button class="pin-button" onclick="enterPin(0)">0</button>
+            <button class="pin-button" onclick="submitPin()">Enter</button>
+        </div>
+    </div>
+
+    <!-- ATM Screen -->
+    <div id="atm-screen" class="container hidden">
+        <h2>Welcome to Your Bank!</h2>
+        <h3>Your Balance: $<span id="balance" class="balance-display">0.00</span></h3>
+        <input type="number" id="amount" placeholder="How much money?" inputmode="decimal">
+        <input type="text" id="description" placeholder="What is it for? (optional)">
+        <input type="date" id="date">
+        <button class="primary-action" onclick="addMoney()">💰 Add Money</button>
+        <button class="primary-action take-out" onclick="subtractMoney()">🛍️ Take Out Money</button>
+        <button onclick="undoLastTransaction()">🔄 Undo Last</button>
+
+        <h3>Weekly Summary</h3>
+        <div id="weekly-summary"></div>
+
+        <h3>Monthly Summary</h3>
+        <div id="monthly-summary"></div>
+
+        <h3>What Happened?</h3>
+        <div id="history"></div>
+
+        <button onclick="endSession()">🏁 End Session</button>
+    </div>
+
+    <!-- Admin Screen -->
+    <div id="admin-screen" class="container hidden">
+        <h2>👩‍💻 Admin Mode</h2>
+        <button onclick="resetAllData()">🧹 Reset All Data</button>
+        <button onclick="endSession()">🚪 Exit</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
